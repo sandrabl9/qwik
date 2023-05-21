@@ -15,7 +15,7 @@ export default component$(() => {
   return (
     <>
       <span class="text-2xl">Buscador simple</span>
-      <span class="text-8xl">{pokeId}</span>
+      <span class="text-5xl">{pokeId}</span>
       <PokemonImage
         id={pokeId.value}
         size={200}
