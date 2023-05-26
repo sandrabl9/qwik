@@ -3,7 +3,7 @@ import { component$, useSignal, useTask$ } from "@builder.io/qwik";
 interface PokemonImageProps {
   id: number;
   size?: number;
-  backImage: boolean;
+  backImage?: boolean;
   isVisible?: boolean;
 }
 
