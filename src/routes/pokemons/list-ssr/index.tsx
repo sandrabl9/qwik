@@ -5,30 +5,25 @@ import {
   routeLoader$,
   useLocation,
 } from "@builder.io/qwik-city";
-import type {
-  PokemonInfo,
-  PokemonsResponse,
-} from "~/components/interfaces/response-pokemon-api";
+import type { SinglePokemon } from "~/components/interfaces";
+import { PokemonImage } from "~/components/pokemons/pokemon-image";
+import { getSinglePokemon } from "~/helpers/get-single-pokemon";
 
-export const usePokemonList = routeLoader$<PokemonInfo[]>(
+export const usePokemonList = routeLoader$<SinglePokemon[]>(
   async ({ query, redirect, pathname }) => {
     const offset = Number(query.get("offset")) || 0;
     if (isNaN(offset) || offset < 0) redirect(301, pathname);
-    const resp = await fetch(
-      `https://pokeapi.co/api/v2/pokemon?limit=10&offset=${offset}`
-    );
-    const data = (await resp.json()) as PokemonsResponse;
 
-    return data.results;
+    return await getSinglePokemon(offset);
   }
 );
 export default component$(() => {
   const location = useLocation();
   const currentOffset = useComputed$<number>(() => {
     const offsetString = new URLSearchParams(location.url.search);
-    const offset = Number(offsetString.get("offset") || 0);
+    const offsetNumber = Number(offsetString.get("offset") || 0);
 
-    return offset;
+    return offsetNumber;
   });
 
   const pokemons = usePokemonList();
@@ -63,6 +58,7 @@ export default component$(() => {
             class="m-5 flex flex-col justify-center items-center"
           >
             <spam class="capitalize">{pokemon.name}</spam>
+            <PokemonImage id={Number(pokemon.id)} isVisible />
           </div>
         ))}
       </div>
