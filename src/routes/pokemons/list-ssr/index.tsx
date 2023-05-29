@@ -7,23 +7,23 @@ import {
 } from "@builder.io/qwik-city";
 import type { SinglePokemon } from "~/components/interfaces";
 import { PokemonImage } from "~/components/pokemons/pokemon-image";
-import { getSiglePokemon } from "~/helpers/get-single-pokemon";
+import { getSinglePokemon } from "~/helpers/get-single-pokemon";
 
 export const usePokemonList = routeLoader$<SinglePokemon[]>(
   async ({ query, redirect, pathname }) => {
     const offset = Number(query.get("offset")) || 0;
     if (isNaN(offset) || offset < 0) redirect(301, pathname);
 
-    return await getSiglePokemon(offset);
+    return await getSinglePokemon(offset);
   }
 );
 export default component$(() => {
   const location = useLocation();
   const currentOffset = useComputed$<number>(() => {
     const offsetString = new URLSearchParams(location.url.search);
-    const offset = Number(offsetString.get("offset") || 0);
+    const offsetNumber = Number(offsetString.get("offset") || 0);
 
-    return offset;
+    return offsetNumber;
   });
 
   const pokemons = usePokemonList();
