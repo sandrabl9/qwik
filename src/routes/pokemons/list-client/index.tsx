@@ -1,4 +1,10 @@
-import { component$, useStore, useVisibleTask$ } from "@builder.io/qwik";
+import {
+  $,
+  component$,
+  useOnDocument,
+  useStore,
+  useTask$,
+} from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
 import type { SinglePokemon } from "~/components/interfaces";
 import { PokemonImage } from "~/components/pokemons/pokemon-image";
@@ -6,20 +12,37 @@ import { getSinglePokemon } from "~/helpers/get-single-pokemon";
 
 interface PokemonState {
   currentPage: number;
+  isLoading: boolean;
   pokemons: SinglePokemon[];
 }
 
 export default component$(() => {
   const pokemonState = useStore<PokemonState>({
     currentPage: 0,
+    isLoading: false,
     pokemons: [],
   });
 
-  useVisibleTask$(async ({ track }) => {
+  useTask$(async ({ track }) => {
     track(() => pokemonState.currentPage);
-    const pokemons = await getSinglePokemon(pokemonState.currentPage * 10);
-    pokemonState.pokemons = pokemons;
+    const pokemons = await getSinglePokemon(pokemonState.currentPage * 10, 30);
+    pokemonState.pokemons = [...pokemonState.pokemons, ...pokemons];
+    pokemonState.isLoading = false;
   });
+
+  useOnDocument(
+    "scroll",
+    $((event) => {
+      const maxScroll = document.body.scrollHeight;
+      const currentScroll = window.scrollY + window.innerHeight;
+
+      if (currentScroll + 200 >= maxScroll && !pokemonState.isLoading) {
+        pokemonState.isLoading = true;
+        pokemonState.currentPage++;
+      }
+    })
+  );
+
   return (
     <>
       <div class="flex flex-col">
@@ -28,12 +51,12 @@ export default component$(() => {
         <spam class="h-2 text-center">Loading...</spam>
       </div>
       <div class="mt-10">
-        <button
+        {/* <button
           onClick$={() => pokemonState.currentPage--}
           class="btn btn-primary mr-2"
         >
           PREVIOUS
-        </button>
+        </button> */}
         <button
           onClick$={() => pokemonState.currentPage++}
           class="btn btn-primary mr-2"
@@ -41,7 +64,7 @@ export default component$(() => {
           NEXT
         </button>
       </div>
-      <div class="grid grid-cols-5 mt-5">
+      <div class="grid sm:grid-cols-2 md:grid-cols-5 xl:grid-cols-7 mt-5">
         {pokemonState.pokemons.map((pokemon) => (
           <div
             key={pokemon.name}
