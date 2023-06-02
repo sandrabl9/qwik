@@ -12,11 +12,6 @@ import { PokemonListStateContext } from "~/context";
 import { getSinglePokemon } from "~/helpers/get-single-pokemon";
 
 export default component$(() => {
-  // const pokemonState = useStore<PokemonState>({
-  //   currentPage: 0,
-  //   isLoading: false,
-  //   pokemons: [],
-  // });
   const pokemonState = useContext(PokemonListStateContext);
 
   useTask$(async ({ track }) => {
