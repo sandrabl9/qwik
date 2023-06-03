@@ -1,7 +1,6 @@
-import { component$, useContext } from "@builder.io/qwik";
+import { component$ } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { PokemonImage } from "~/components/pokemons/pokemon-image";
-import { PokemonStateContext } from "~/context";
 import { usePokemonView } from "~/hooks/use-pokemon-view";
 
 export const usePokemonId = routeLoader$<number>(({ params, redirect }) => {
