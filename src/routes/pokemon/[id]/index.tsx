@@ -2,6 +2,7 @@ import { component$, useContext } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { PokemonImage } from "~/components/pokemons/pokemon-image";
 import { PokemonStateContext } from "~/context";
+import { usePokemonView } from "~/hooks/use-pokemon-view";
 
 export const usePokemonId = routeLoader$<number>(({ params, redirect }) => {
   const id = Number(params.id);
@@ -13,16 +14,35 @@ export const usePokemonId = routeLoader$<number>(({ params, redirect }) => {
 });
 export default component$(() => {
   const pokemonId = usePokemonId();
-  const pokemon = useContext(PokemonStateContext);
+
+  const {
+    pokeId,
+    isVisible,
+    showBackImage,
+    toggleBackImage,
+    toggleVisbleImage,
+    toggleInvisbleImage,
+  } = usePokemonView();
 
   return (
-    <div>
-      <spam>Pokemon: {pokemonId.value}</spam>
+    <>
+      <spam class="text-2xl">Pokemon: {pokemonId.value}</spam>
       <PokemonImage
         id={pokemonId.value}
-        isVisible={pokemon.isVisibleImagePoke}
-        backImage={pokemon.showBackImagePoke}
+        isVisible={isVisible.value}
+        backImage={showBackImage.value}
       />
-    </div>
+      <div>
+        <button onClick$={toggleBackImage} class="btn btn-primary mr-2">
+          Voltear
+        </button>
+        <button onClick$={toggleVisbleImage} class="btn btn-primary mr-2">
+          Revelar
+        </button>
+        <button onClick$={toggleInvisbleImage} class="btn btn-primary">
+          Ocultar
+        </button>
+      </div>
+    </>
   );
 });
