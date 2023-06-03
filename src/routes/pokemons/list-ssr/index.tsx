@@ -1,4 +1,10 @@
-import { component$, useComputed$ } from "@builder.io/qwik";
+import {
+  $,
+  component$,
+  useComputed$,
+  useSignal,
+  useStore,
+} from "@builder.io/qwik";
 import {
   DocumentHead,
   Link,
@@ -7,6 +13,7 @@ import {
 } from "@builder.io/qwik-city";
 import type { SinglePokemon } from "~/components/interfaces";
 import { PokemonImage } from "~/components/pokemons/pokemon-image";
+import { Modal } from "~/components/shared";
 import { getSinglePokemon } from "~/helpers/get-single-pokemon";
 
 export const usePokemonList = routeLoader$<SinglePokemon[]>(
@@ -19,6 +26,23 @@ export const usePokemonList = routeLoader$<SinglePokemon[]>(
 );
 export default component$(() => {
   const location = useLocation();
+  const isModalVisible = useSignal(false);
+
+  const modalPokemon = useStore({
+    id: "",
+    name: "",
+  });
+
+  const handleOpenModal = $((name: string, id: string) => {
+    modalPokemon.name = name;
+    modalPokemon.id = id;
+    isModalVisible.value = true;
+  });
+
+  const handleCloseModal = $(() => {
+    isModalVisible.value = false;
+  });
+
   const currentOffset = useComputed$<number>(() => {
     const offsetString = new URLSearchParams(location.url.search);
     const offsetNumber = Number(offsetString.get("offset") || 0);
@@ -51,17 +75,29 @@ export default component$(() => {
           NEXT
         </Link>
       </div>
-      <div class="grid grid-cols-5 mt-5">
+      <div class="grid sm:grid-cols-2 md:grid-cols-5 xl:grid-cols-7 mt-5">
         {pokemons.value.map((pokemon) => (
           <div
-            key={pokemon.name}
+            key={pokemon.id}
             class="m-5 flex flex-col justify-center items-center"
+            onClick$={() => handleOpenModal(pokemon.name, pokemon.id)}
           >
             <spam class="capitalize">{pokemon.name}</spam>
             <PokemonImage id={Number(pokemon.id)} isVisible />
           </div>
         ))}
       </div>
+      <Modal
+        showModal={isModalVisible.value}
+        onCloseModal={handleCloseModal}
+        size="lg"
+      >
+        <div q:slot="title">{modalPokemon.name}</div>
+        <div q:slot="content" class="flex flex-col justify-center items-center">
+          <PokemonImage id={Number(modalPokemon.id)} isVisible />
+          <span>Obteniedno info...</span>
+        </div>
+      </Modal>
     </>
   );
 });
