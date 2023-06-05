@@ -17,6 +17,9 @@ export default component$(() => {
             <Link href="/login">Login</Link>
           </li>
           <li>
+            <Link href="/dashboard">Dashboard</Link>
+          </li>
+          <li>
             <Link href="/pokemons/list-ssr">SSR-List</Link>
           </li>
           <li>
